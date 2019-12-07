@@ -8,4 +8,11 @@ export default class State {
     public deckCards: Card[] = [];
     public burnedCard?: Card;
     public isRoundStarted = false;
+
+    public resetState() {
+        this.players = [];
+        this.deckCards = [];
+        this.burnedCard = undefined;
+        this.isRoundStarted = false;
+    }
 }
