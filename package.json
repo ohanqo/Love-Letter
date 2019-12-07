@@ -1,0 +1,29 @@
+{
+    "name": "love-letter-server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "serve": "concurrently --kill-others \"npm run build\" \"nodemon build/src/index.js\"",
+        "build": "tsc -w -p tsconfig.json"
+    },
+    "author": "ohanqo",
+    "license": "ISC",
+    "devDependencies": {
+        "concurrently": "^5.0.0",
+        "nodemon": "^2.0.1",
+        "tslint": "^5.20.1",
+        "typescript": "^3.7.3"
+    },
+    "dependencies": {
+        "@types/dotenv": "^8.2.0",
+        "@types/socket.io": "^2.1.4",
+        "dotenv": "^8.2.0",
+        "http": "^0.0.0",
+        "inversify": "^5.0.1",
+        "inversify-socket-utils": "^1.0.3",
+        "reflect-metadata": "^0.1.13",
+        "socket.io": "^2.3.0",
+        "ts-node": "^8.5.4"
+    }
+}
