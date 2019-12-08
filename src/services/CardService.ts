@@ -14,7 +14,7 @@ export default class CardService {
     }
 
     public shuffle() {
-        this.state.resetState();
+        this.state.resetCards();
 
         cards.forEach((card: CardMapping) => {
             const cardList = this.getAmountOfCards(card.type, card.amount);
@@ -22,6 +22,22 @@ export default class CardService {
         });
 
         this.state.deckCards = _.shuffle(this.state.deckCards);
+    }
+
+    public burnCard() {
+        const burnedCard = _.first(this.state.deckCards);
+        this.state.burnedCard = burnedCard;
+        _.pull(this.state.deckCards, burnedCard);
+    }
+
+    public hasRemainingCards(): boolean {
+        return this.state.deckCards.length > 0;
+    }
+
+    public pickCard(): Card | undefined {
+        const card = _.first(this.state.deckCards);
+        _.pull(this.state.deckCards, card);
+        return card;
     }
 
     private getAmountOfCards(card: new () => Card, amount: number): Card[] {

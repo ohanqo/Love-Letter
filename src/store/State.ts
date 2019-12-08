@@ -6,13 +6,19 @@ import Card from "../models/cards/Card";
 export default class State {
     public players: Player[] = [];
     public deckCards: Card[] = [];
+    public previousWinner?: Player;
     public burnedCard?: Card;
     public isRoundStarted = false;
 
-    public resetState() {
-        this.players = [];
+    public resetCards() {
         this.deckCards = [];
         this.burnedCard = undefined;
+    }
+
+    public resetState() {
+        this.resetCards();
+        this.players = [];
+        this.previousWinner = undefined;
         this.isRoundStarted = false;
     }
 }
