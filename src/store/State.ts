@@ -4,10 +4,10 @@ import Card from "../models/cards/Card";
 
 @injectable()
 export default class State {
-    public players: Player[] = [];
     public deckCards: Card[] = [];
-    public previousWinner?: Player;
     public burnedCard?: Card;
+    public players: Player[] = [];
+    public previousWinner?: Player;
     public isRoundStarted = false;
 
     public resetCards() {
