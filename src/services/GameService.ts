@@ -27,12 +27,15 @@ export default class GameService {
         this.distributeCards();
     }
 
+    public distributeCardToPlayer(player: Player) {
+        const potentialCard = this.cardService.pickCard();
+
+        if (potentialCard) {
+            player.cardsHand.push(potentialCard);
+        }
+    }
+
     private distributeCards() {
-        this.state.players.map((p: Player) => {
-            const potentialCard = this.cardService.pickCard();
-            if (potentialCard) {
-                p.cardsHand.push(potentialCard);
-            }
-        });
+        this.state.players.map((p: Player) => this.distributeCardToPlayer(p));
     }
 }

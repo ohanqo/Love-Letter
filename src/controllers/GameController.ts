@@ -13,22 +13,25 @@ import typesConfig from "../configs/types.config";
 import events from "../events/events";
 import State from "../store/State";
 import GameService from "../services/GameService";
-import Card from "../models/cards/Card";
+import CardService from "../services/CardService";
 
 @injectable()
 @Controller("/")
 export default class GameController {
     public state: State;
     public playerService: PlayerService;
+    public cardService: CardService;
     public gameService: GameService;
 
     public constructor(
         @inject(typesConfig.State) state: State,
         @inject(typesConfig.PlayerService) playerService: PlayerService,
+        @inject(typesConfig.CardService) cardService: CardService,
         @inject(typesConfig.GameService) gameService: GameService,
     ) {
         this.state = state;
         this.playerService = playerService;
+        this.cardService = cardService;
         this.gameService = gameService;
     }
 
@@ -63,6 +66,16 @@ export default class GameController {
             const player = this.playerService.updatePlayerTurn();
             io.emit(events.StartRound, this.state.players);
             io.emit(events.PlayerTurn, player);
+        }
+    }
+
+    @OnMessage(events.Pick)
+    public onPick(@SocketID() id: string, @SocketIO() io: SocketIO.Server) {
+        const player = this.playerService.findPlayer(id);
+
+        if (this.playerService.canPickCard(player)) {
+            this.gameService.distributeCardToPlayer(player);
+            io.emit(events.CardPicked, this.state.players);
         }
     }
 

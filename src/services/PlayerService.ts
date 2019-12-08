@@ -22,6 +22,10 @@ export default class PlayerService {
         _.remove(this.state.players, (p: Player) => p.id === id);
     }
 
+    public findPlayer(id: string): Player {
+        return this.state.players.find((p: Player) => p.id === id);
+    }
+
     public updatePlayerTurn(): Player {
         let player: Player | undefined;
 
@@ -62,5 +66,10 @@ export default class PlayerService {
 
     public hasEnoughPlayers(): boolean {
         return this.state.players.length >= rulesConfig.MIN_PLAYERS;
+    }
+
+    public canPickCard(player: Player): boolean {
+         return player.isPlayerTurn &&
+             player.cardsHand.length < rulesConfig.MAX_CARD_PER_HAND;
     }
 }
