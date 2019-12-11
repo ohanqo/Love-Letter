@@ -1,5 +1,7 @@
 import { v1 } from "uuid";
+import { injectable } from "inversify";
 
+@injectable()
 export default abstract class Card {
     public id = "unknown";
     public name = "unknown";

@@ -1,5 +1,7 @@
 import Card from "./Card";
+import { injectable } from "inversify";
 
+@injectable()
 export default class King extends Card {
     public name = "Roi";
     public value = 7;

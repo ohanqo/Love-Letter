@@ -7,17 +7,18 @@ import * as _ from "lodash";
 
 @injectable()
 export default class CardService {
-    public state: State;
-
-    public constructor(@inject(typesConfig.State) state: State) {
-        this.state = state;
-    }
+    public constructor(
+        @inject(typesConfig.State)
+        public state: State,
+        @inject(typesConfig.CardFactory)
+        public cardFactory: (named: string) => Card,
+    ) {}
 
     public shuffle() {
         this.state.resetCards();
 
         cards.forEach((card: CardMapping) => {
-            const cardList = this.getAmountOfCards(card.type, card.amount);
+            const cardList = this.getAmountOfCards(card.name, card.amount);
             this.state.deckCards.push(...cardList);
         });
 
@@ -40,11 +41,11 @@ export default class CardService {
         return card;
     }
 
-    private getAmountOfCards(card: new () => Card, amount: number): Card[] {
+    private getAmountOfCards(cardName: string, amount: number): Card[] {
         const cardList: Card[] = [];
 
         for (let i = 0; i < amount; i++) {
-            cardList.push(new card());
+            cardList.push(this.cardFactory(cardName));
         }
 
         return cardList;

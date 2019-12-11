@@ -3,4 +3,6 @@ export default {
     PlayerService: Symbol("PlayerService"),
     CardService: Symbol("CardService"),
     GameService: Symbol("GameService"),
+    Card: Symbol("Card"),
+    CardFactory: Symbol("CardFactory"),
 };
