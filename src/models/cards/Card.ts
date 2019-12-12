@@ -1,5 +1,7 @@
 import { v1 } from "uuid";
 import { injectable } from "inversify";
+import Player from "../Player";
+import PlayCardDto from "../../dtos/PlayCardDto";
 
 @injectable()
 export default abstract class Card {
@@ -14,7 +16,11 @@ export default abstract class Card {
         this.id = v1();
     }
 
-    public action() {
+    public action(player: Player, playCardDto: PlayCardDto) {
         console.log(`${this.name} does nothing.`);
+    }
+
+    public updateToLooseStatus(player: Player) {
+        
     }
 }

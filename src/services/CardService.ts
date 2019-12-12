@@ -4,6 +4,7 @@ import typesConfig from "../configs/types.config";
 import { cards, CardMapping } from "../configs/cards.config";
 import Card from "../models/cards/Card";
 import * as _ from "lodash";
+import Player from "../models/Player";
 
 @injectable()
 export default class CardService {
@@ -39,6 +40,15 @@ export default class CardService {
         const card = _.first(this.state.deckCards);
         _.pull(this.state.deckCards, card);
         return card;
+    }
+
+    public findCardFromPlayer(id: string, player: Player): Card | undefined {
+        return player.cardsHand.find((c: Card) => c.id === id);
+    }
+
+    public useCard(player: Player, card: Card) {
+        _.pull(player.cardsHand, card);
+        player.consumedCards.push(card);
     }
 
     private getAmountOfCards(cardName: string, amount: number): Card[] {

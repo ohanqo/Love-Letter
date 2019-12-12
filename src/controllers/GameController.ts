@@ -14,6 +14,7 @@ import events from "../events/events";
 import State from "../store/State";
 import GameService from "../services/GameService";
 import CardService from "../services/CardService";
+import PlayCardDto from "../dtos/PlayCardDto";
 
 @injectable()
 @Controller("/")
@@ -77,6 +78,23 @@ export default class GameController {
             this.gameService.distributeCardToPlayer(player);
             io.emit(events.CardPicked, this.state.players);
         }
+    }
+
+    @OnMessage(events.PlayCard)
+    public onPlayCard(
+        @Payload() playCardDto: PlayCardDto,
+        @SocketID() id: string,
+        @SocketIO() io: SocketIO.Server,
+    ) {
+        const player = this.playerService.findPlayer(id);
+        const cardToPlay = this.cardService.findCardFromPlayer(
+            playCardDto.cardId,
+            player,
+        );
+
+        this.cardService.useCard(player, cardToPlay);
+        cardToPlay?.action(player, playCardDto);
+        io.emit(events.CardPlayed, this.state.players);
     }
 
     @OnDisconnect("disconnect")
