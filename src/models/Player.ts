@@ -7,5 +7,6 @@ export default class Player {
         public cardsHand: Card[] = [],
         public consumedCards: Card[] = [],
         public isPlayerTurn = false,
+        public hasLost = false,
     ) {}
 }

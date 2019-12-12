@@ -8,6 +8,6 @@ export default class Priest extends Card {
     public isPassive = false;
 
     public action() {
-        console.log(`${this.name} visualisez la carte d'un adversaire`);
+        return;
     }
 }

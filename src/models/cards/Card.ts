@@ -2,6 +2,7 @@ import { v1 } from "uuid";
 import { injectable } from "inversify";
 import Player from "../Player";
 import PlayCardDto from "../../dtos/PlayCardDto";
+import { pull } from "lodash";
 
 @injectable()
 export default abstract class Card {
@@ -16,11 +17,14 @@ export default abstract class Card {
         this.id = v1();
     }
 
-    public action(player: Player, playCardDto: PlayCardDto) {
-        console.log(`${this.name} does nothing.`);
+    public action(player: Player, dto: PlayCardDto) {
+        return;
     }
 
     public updateToLooseStatus(player: Player) {
-        
+        const card = player.cardsHand[0];
+        pull(player.cardsHand, card);
+        player.consumedCards.push(card);
+        player.hasLost = true;
     }
 }

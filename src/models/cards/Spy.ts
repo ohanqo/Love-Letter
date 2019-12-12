@@ -8,8 +8,6 @@ export default class Spy extends Card {
     public isPassive = true;
 
     public action() {
-        console.log(
-            `${this.name} gagnez 1 piont faveur si personne ne joue/defausse une Espionne`,
-        );
+        return;
     }
 }

@@ -8,6 +8,6 @@ export default class Handmaiden extends Card {
     public isPassive = true;
 
     public action() {
-        console.log(`${this.name} vous protège des attaques pendant un tour.`);
+        return;
     }
 }

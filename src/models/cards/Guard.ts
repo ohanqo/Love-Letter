@@ -8,8 +8,6 @@ export default class Guard extends Card {
     public isPassive = false;
 
     public action() {
-        console.log(
-            `${this.name} devinez la carte d'un adversaire (ne pas devinez un garde).`,
-        );
+        // TODO
     }
 }

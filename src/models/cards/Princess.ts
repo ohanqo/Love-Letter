@@ -8,6 +8,6 @@ export default class Princess extends Card {
     public isPassive = true;
 
     public action() {
-        console.log(`${this.name} ne doit pas être défaussé`);
+        return;
     }
 }

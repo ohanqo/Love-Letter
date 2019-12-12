@@ -1,5 +1,7 @@
 import Card from "./Card";
 import { injectable } from "inversify";
+import PlayCardDto from "../../dtos/PlayCardDto";
+import Player from "../Player";
 
 @injectable()
 export default class Chancellor extends Card {
@@ -7,9 +9,7 @@ export default class Chancellor extends Card {
     public value = 6;
     public isPassive = true;
 
-    public action() {
-        console.log(
-            `${this.name} pioche deux cartes supplémentaire et en repose deux à la fin du paquet.`,
-        );
+    public action(player: Player, dto: PlayCardDto) {
+        // TODO
     }
 }
