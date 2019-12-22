@@ -7,11 +7,7 @@ import * as _ from "lodash";
 
 @injectable()
 export default class PlayerService {
-    public state: State;
-
-    public constructor(@inject(typesConfig.State) state: State) {
-        this.state = state;
-    }
+    public constructor(@inject(typesConfig.State) public state: State) {}
 
     public addPlayer(id: string, username: string) {
         const player = new Player(id, username);
@@ -69,7 +65,9 @@ export default class PlayerService {
     }
 
     public canPickCard(player: Player): boolean {
-         return player.isPlayerTurn &&
-             player.cardsHand.length < rulesConfig.MAX_CARD_PER_HAND;
+        return (
+            player.isPlayerTurn &&
+            player.cardsHand.length < rulesConfig.MAX_CARD_PER_HAND
+        );
     }
 }

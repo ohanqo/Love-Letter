@@ -42,13 +42,23 @@ export default class CardService {
         return card;
     }
 
-    public findCardFromPlayer(id: string, player: Player): Card | undefined {
-        return player.cardsHand.find((c: Card) => c.id === id);
-    }
-
     public useCard(player: Player, card: Card) {
         _.pull(player.cardsHand, card);
         player.consumedCards.push(card);
+    }
+
+    public pickCards(amount: number): Card[] {
+        const pickedCards: Card[] = [];
+
+        for (let i = 0; i < amount; i++) {
+            const cardPicked = this.pickCard();
+
+            if (cardPicked) {
+                pickedCards.push(cardPicked);
+            }
+        }
+
+        return pickedCards;
     }
 
     private getAmountOfCards(cardName: string, amount: number): Card[] {

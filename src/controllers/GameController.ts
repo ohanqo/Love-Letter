@@ -15,26 +15,17 @@ import State from "../store/State";
 import GameService from "../services/GameService";
 import CardService from "../services/CardService";
 import PlayCardDto from "../dtos/PlayCardDto";
+import rulesConfig from "../configs/rules.config";
 
 @injectable()
 @Controller("/")
 export default class GameController {
-    public state: State;
-    public playerService: PlayerService;
-    public cardService: CardService;
-    public gameService: GameService;
-
     public constructor(
-        @inject(typesConfig.State) state: State,
-        @inject(typesConfig.PlayerService) playerService: PlayerService,
-        @inject(typesConfig.CardService) cardService: CardService,
-        @inject(typesConfig.GameService) gameService: GameService,
-    ) {
-        this.state = state;
-        this.playerService = playerService;
-        this.cardService = cardService;
-        this.gameService = gameService;
-    }
+        @inject(typesConfig.State) public state: State,
+        @inject(typesConfig.PlayerService) public playerService: PlayerService,
+        @inject(typesConfig.CardService) public cardService: CardService,
+        @inject(typesConfig.GameService) public gameService: GameService,
+    ) {}
 
     @OnMessage(events.PlayerConnect)
     public onPlayerConnection(
@@ -82,24 +73,39 @@ export default class GameController {
 
     @OnMessage(events.PlayCard)
     public onPlayCard(
-        @Payload() playCardDto: PlayCardDto,
         @SocketID() id: string,
         @SocketIO() io: SocketIO.Server,
+        @Payload() playCardDto: PlayCardDto,
     ) {
         const player = this.playerService.findPlayer(id);
-        const cardToPlay = this.cardService.findCardFromPlayer(
-            playCardDto.cardId,
-            player,
-        );
+        const cardToPlay = player.findInHand(playCardDto.cardId);
 
         this.cardService.useCard(player, cardToPlay);
         cardToPlay?.action(player, playCardDto);
         io.emit(events.CardPlayed, this.state.players);
     }
 
+    @OnMessage(events.PlayChancellorCard)
+    public onPlayChancellorCard(
+        @SocketID() id: string,
+        @SocketIO() io: SocketIO.Server,
+        @ConnectedSocket() socket: SocketIO.Socket,
+    ) {
+        // Use card ?
+        const player = this.playerService.findPlayer(id);
+        const pickedCards = this.cardService.pickCards(
+            rulesConfig.CHANCELLOR_PICKED_CARD,
+        );
+
+        player.cardsHand.push(...pickedCards);
+        io.emit(events.Players, this.state.players);
+        socket.emit(events.ChancellorChooseCard);
+    }
+
     @OnDisconnect("disconnect")
     public disconnect(@SocketID() id: string, @SocketIO() io: SocketIO.Server) {
         this.playerService.removePlayer(id);
         io.emit(events.Players, this.state.players);
+        this.gameService.checkMinPlayers();
     }
 }

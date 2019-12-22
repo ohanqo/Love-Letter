@@ -9,4 +9,8 @@ export default class Player {
         public isPlayerTurn = false,
         public hasLost = false,
     ) {}
+
+    public findInHand(cardId: string): Card {
+        return this.cardsHand.find((c: Card) => c.id === cardId);
+    }
 }
