@@ -21,6 +21,11 @@ export default class GameService {
         this.distributeCards();
     }
 
+    public switchPlayerTurn() {
+        const nextPlayer = this.playerService.getNextPlayer();
+        this.playerService.setCurrentPlayerTurn(nextPlayer);
+    }
+
     public distributeCardToPlayer(player: Player) {
         const potentialCard = this.cardService.pickCard();
 

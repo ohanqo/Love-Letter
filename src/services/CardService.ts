@@ -61,6 +61,16 @@ export default class CardService {
         return pickedCards;
     }
 
+    public pushCards(cardList: Card[]) {
+        this.state.deckCards.push(...cardList);
+    }
+
+    public filterRefsById(sourceList: Card[], dto: Card[]) {
+        return dto.map((cDTO: Card) =>
+            sourceList.find((cSource: Card) => cSource.id === cDTO.id),
+        );
+    }
+
     private getAmountOfCards(cardName: string, amount: number): Card[] {
         const cardList: Card[] = [];
 

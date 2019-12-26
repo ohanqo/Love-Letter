@@ -22,17 +22,9 @@ export default class PlayerService {
         return this.state.players.find((p: Player) => p.id === id);
     }
 
-    public updatePlayerTurn(): Player {
-        let player: Player | undefined;
-
-        if (this.state.previousWinner) {
-            player = this.getNextPlayer();
-        } else {
-            player = this.getRandomPlayer();
-        }
-
-        player.isPlayerTurn = true;
-
+    public setFirstPlayerToPlay(): Player {
+        const player = this.state.previousWinner ?? this.getRandomPlayer();
+        this.setCurrentPlayerTurn(player);
         return player;
     }
 
@@ -50,6 +42,11 @@ export default class PlayerService {
             this.state.players[currentPlayerIndex + 1] ??
             _.first(this.state.players)
         );
+    }
+
+    public setCurrentPlayerTurn(player: Player) {
+        this.state.players.map((p: Player) => (p.isPlayerTurn = false));
+        player.isPlayerTurn = true;
     }
 
     public isGameFull(): boolean {

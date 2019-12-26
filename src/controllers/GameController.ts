@@ -16,6 +16,8 @@ import GameService from "../services/GameService";
 import CardService from "../services/CardService";
 import PlayCardDto from "../dtos/PlayCardDto";
 import rulesConfig from "../configs/rules.config";
+import Card from "../models/cards/Card";
+import { tail } from "lodash";
 
 @injectable()
 @Controller("/")
@@ -55,7 +57,7 @@ export default class GameController {
             socket.emit(events.AlreadyStarted);
         } else {
             this.gameService.initNewRound();
-            const player = this.playerService.updatePlayerTurn();
+            const player = this.playerService.setFirstPlayerToPlay();
             io.emit(events.StartRound, this.state.players);
             io.emit(events.PlayerTurn, player);
         }
@@ -82,6 +84,7 @@ export default class GameController {
 
         this.cardService.useCard(player, cardToPlay);
         cardToPlay?.action(player, playCardDto);
+        this.gameService.switchPlayerTurn();
         io.emit(events.CardPlayed, this.state.players);
     }
 
@@ -89,17 +92,40 @@ export default class GameController {
     public onPlayChancellorCard(
         @SocketID() id: string,
         @SocketIO() io: SocketIO.Server,
+        @Payload() playCardDto: PlayCardDto,
         @ConnectedSocket() socket: SocketIO.Socket,
     ) {
-        // Use card ?
         const player = this.playerService.findPlayer(id);
+        const cardToPlay = player.findInHand(playCardDto.cardId);
         const pickedCards = this.cardService.pickCards(
             rulesConfig.CHANCELLOR_PICKED_CARD,
         );
 
+        this.cardService.useCard(player, cardToPlay);
         player.cardsHand.push(...pickedCards);
         io.emit(events.Players, this.state.players);
         socket.emit(events.ChancellorChooseCard);
+    }
+
+    @OnMessage(events.ChancellorPlacedCard)
+    public onChancellorPlacedCard(
+        @SocketID() id: string,
+        @SocketIO() io: SocketIO.Server,
+        @Payload() placedCards: Card[],
+    ) {
+        const player = this.playerService.findPlayer(id);
+        const cardToKeepInHand = player.findInHand(placedCards[0].id);
+        const cardsHandRefs = this.cardService.filterRefsById(
+            player.cardsHand,
+            placedCards,
+        );
+        const cardsToPutInDeck = tail(cardsHandRefs);
+
+        player.cardsHand = [];
+        player.cardsHand.push(cardToKeepInHand);
+        this.cardService.pushCards(cardsToPutInDeck);
+        this.gameService.switchPlayerTurn();
+        io.emit(events.CardPlayed, this.state.players);
     }
 
     @OnDisconnect("disconnect")
