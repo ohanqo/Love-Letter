@@ -1,4 +1,8 @@
 import Card from "./cards/Card";
+import Countess from "./cards/Countess";
+import Prince from "./cards/Prince";
+import King from "./cards/King";
+import rulesConfig from "../configs/rules.config";
 
 export default class Player {
     constructor(
@@ -24,5 +28,17 @@ export default class Player {
 
     public isProtected(): boolean {
         return this.consumedCards.some((c: Card) => c.isActiveHandmaiden());
+    }
+
+    public hasToPickCard(): boolean {
+        return this.cardsHand.length < rulesConfig.MAX_CARD_PER_HAND;
+    }
+
+    public hasToPlayCountess(): boolean {
+        return (
+            this.cardsHand.some((c: Card) => c instanceof Countess) &&
+            (this.cardsHand.some((c: Card) => c instanceof Prince) ||
+                this.cardsHand.some((c: Card) => c instanceof King))
+        );
     }
 }

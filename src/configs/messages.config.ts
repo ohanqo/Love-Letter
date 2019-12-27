@@ -11,11 +11,15 @@ const baronLoose = " a perdu contre ";
 const guardWin = " a trouvé la carte de ";
 const guardFail = " n'a pas trouvé la carte de ";
 const chancellorPlayed =
-    " a joué un chancellier, il choisit qu'elle carte il souhaite garder.";
+    " a joué un chancellier, il doit garder une seule carte.";
 const kingPlayed = " a échanger sa main avec celle de ";
 const priestPlayed = " a vu la main de ";
 const princePlayed = " défausse la main de ";
 const princessDiscard = " a perdu car sa Princesse à été défaussée.";
+const cantPlayPrincess = "Vous ne pouvez pas jouer la princesse.";
+const hasToPlayCountess =
+    "Vous devez jouer votre comtesse car vous possédez un prince ou un roi.";
+const hasToPickCard = "Vous devez piocher une carte.";
 
 export {
     success,
@@ -35,4 +39,7 @@ export {
     priestPlayed,
     princePlayed,
     princessDiscard,
+    cantPlayPrincess,
+    hasToPlayCountess,
+    hasToPickCard,
 };

@@ -23,8 +23,12 @@ import {
     pickedCard,
     cantPickCard,
     chancellorPlayed,
+    cantPlayPrincess,
+    hasToPlayCountess,
+    hasToPickCard,
 } from "../configs/messages.config";
 import Message from "../models/Message";
+import Princess from "../models/cards/Princess";
 
 @injectable()
 @Controller("/")
@@ -100,12 +104,29 @@ export default class GameController {
         @SocketID() id: string,
         @SocketIO() io: SocketIO.Server,
         @Payload() playCardDto: PlayCardDto,
+        @ConnectedSocket() socket: SocketIO.Socket,
     ) {
         const player = this.playerService.findPlayer(id);
         const cardToPlay = player.findInHand(playCardDto.cardId);
 
-        // checker la comtesse pour empecher l'utilisation de la carte
-        // pareil pour la princesse
+        // TODO: Refactor using middleware ?
+        if (player.hasToPickCard()) {
+            const msg = Message.error(hasToPickCard);
+            socket.emit(events.Message, msg);
+            return;
+        }
+
+        if (cardToPlay instanceof Princess) {
+            const msg = Message.error(cantPlayPrincess);
+            socket.emit(events.Message, msg);
+            return;
+        }
+
+        if (player.hasToPlayCountess()) {
+            const msg = Message.error(hasToPlayCountess);
+            socket.emit(events.Message, msg);
+            return;
+        }
 
         this.cardService.useCard(player, cardToPlay);
         const message = cardToPlay?.action(player, playCardDto);
@@ -122,6 +143,13 @@ export default class GameController {
         @ConnectedSocket() socket: SocketIO.Socket,
     ) {
         const player = this.playerService.findPlayer(id);
+
+        if (player.hasToPickCard()) {
+            const msg = Message.error(hasToPickCard);
+            socket.emit(events.Message, msg);
+            return;
+        }
+
         const cardToPlay = player.findInHand(playCardDto.cardId);
         const pickedCards = this.cardService.pickCards(
             rulesConfig.CHANCELLOR_PICKED_CARD,
