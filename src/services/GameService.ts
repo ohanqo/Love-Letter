@@ -35,7 +35,10 @@ export default class GameService {
     }
 
     public checkMinPlayers() {
-        if (this.state.players.length < rulesConfig.MIN_PLAYERS) {
+        if (
+            this.state.isRoundStarted &&
+            this.state.players.length < rulesConfig.MIN_PLAYERS
+        ) {
             this.state.resetState();
         }
     }
