@@ -7,6 +7,7 @@ import {
     Payload,
     ConnectedSocket,
     SocketID,
+    OnConnect,
 } from "inversify-socket-utils";
 import PlayerService from "../services/PlayerService";
 import typesConfig from "../configs/types.config";
@@ -34,6 +35,11 @@ export default class GameController {
         @inject(typesConfig.CardService) public cardService: CardService,
         @inject(typesConfig.GameService) public gameService: GameService,
     ) {}
+
+    @OnConnect("connection")
+    public connection(@ConnectedSocket() socket: SocketIO.Socket) {
+        socket.emit(events.Players, this.state.players);
+    }
 
     @OnMessage(events.PlayerConnect)
     public onPlayerConnection(
@@ -155,7 +161,7 @@ export default class GameController {
     @OnDisconnect("disconnect")
     public disconnect(@SocketID() id: string, @SocketIO() io: SocketIO.Server) {
         this.playerService.removePlayer(id);
-        io.emit(events.Players, this.state.players);
         this.gameService.checkMinPlayers();
+        io.emit(events.Players, this.state.players);
     }
 }
