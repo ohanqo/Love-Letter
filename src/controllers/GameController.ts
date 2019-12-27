@@ -18,6 +18,12 @@ import PlayCardDto from "../dtos/PlayCardDto";
 import rulesConfig from "../configs/rules.config";
 import Card from "../models/cards/Card";
 import { tail } from "lodash";
+import {
+    pickedCard,
+    cantPickCard,
+    chancellorPlayed,
+} from "../configs/messages.config";
+import Message from "../models/Message";
 
 @injectable()
 @Controller("/")
@@ -64,12 +70,22 @@ export default class GameController {
     }
 
     @OnMessage(events.Pick)
-    public onPick(@SocketID() id: string, @SocketIO() io: SocketIO.Server) {
+    public onPick(
+        @SocketID() id: string,
+        @SocketIO() io: SocketIO.Server,
+        @ConnectedSocket() socket: SocketIO.Socket,
+    ) {
         const player = this.playerService.findPlayer(id);
 
         if (this.playerService.canPickCard(player)) {
             this.gameService.distributeCardToPlayer(player);
             io.emit(events.CardPicked, this.state.players);
+            socket.broadcast.emit(
+                events.Message,
+                Message.success(`${player.name}${pickedCard}`),
+            );
+        } else {
+            socket.emit(events.Message, Message.error(cantPickCard));
         }
     }
 
@@ -82,10 +98,14 @@ export default class GameController {
         const player = this.playerService.findPlayer(id);
         const cardToPlay = player.findInHand(playCardDto.cardId);
 
+        // checker la comtesse pour empecher l'utilisation de la carte
+        // pareil pour la princesse
+
         this.cardService.useCard(player, cardToPlay);
-        cardToPlay?.action(player, playCardDto);
+        const message = cardToPlay?.action(player, playCardDto);
         this.gameService.switchPlayerTurn();
         io.emit(events.CardPlayed, this.state.players);
+        io.emit(events.Message, message);
     }
 
     @OnMessage(events.PlayChancellorCard)
@@ -104,6 +124,10 @@ export default class GameController {
         this.cardService.useCard(player, cardToPlay);
         player.cardsHand.push(...pickedCards);
         io.emit(events.Players, this.state.players);
+        io.emit(
+            events.Message,
+            Message.success(`${player.name}${chancellorPlayed}`),
+        );
         socket.emit(events.ChancellorChooseCard);
     }
 

@@ -13,4 +13,16 @@ export default class Player {
     public findInHand(cardId: string): Card {
         return this.cardsHand.find((c: Card) => c.id === cardId);
     }
+
+    public discardActiveHandmaiden() {
+        this.consumedCards.map((c: Card) => {
+            if (c.isActiveHandmaiden()) {
+                c.isDiscarded = true;
+            }
+        });
+    }
+
+    public isProtected(): boolean {
+        return this.consumedCards.some((c: Card) => c.isActiveHandmaiden());
+    }
 }

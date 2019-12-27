@@ -6,8 +6,4 @@ export default class Countess extends Card {
     public name = "Comtesse";
     public value = 8;
     public isPassive = true;
-
-    public action() {
-        return;
-    }
 }

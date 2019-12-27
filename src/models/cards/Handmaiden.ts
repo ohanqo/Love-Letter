@@ -6,8 +6,4 @@ export default class Handmaiden extends Card {
     public name = "Servante";
     public value = 4;
     public isPassive = true;
-
-    public action() {
-        return;
-    }
 }

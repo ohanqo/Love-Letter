@@ -4,6 +4,8 @@ import State from "../store/State";
 import rulesConfig from "../configs/rules.config";
 import Player from "../models/Player";
 import * as _ from "lodash";
+import Card from "../models/cards/Card";
+import Handmaiden from "../models/cards/Handmaiden";
 
 @injectable()
 export default class PlayerService {
@@ -46,6 +48,7 @@ export default class PlayerService {
 
     public setCurrentPlayerTurn(player: Player) {
         this.state.players.map((p: Player) => (p.isPlayerTurn = false));
+        player.discardActiveHandmaiden();
         player.isPlayerTurn = true;
     }
 
