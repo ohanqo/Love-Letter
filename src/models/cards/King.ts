@@ -2,12 +2,9 @@ import Card from "./Card";
 import { injectable } from "inversify";
 import Player from "../Player";
 import PlayCardDto from "../../dtos/PlayCardDto";
-import { container } from "../../configs/inversify.config";
-import PlayerService from "../../services/PlayerService";
-import typesConfig from "../../configs/types.config";
 import { pull } from "lodash";
 import Message from "../Message";
-import { cantAttackTarget, kingPlayed } from "../../configs/messages.config";
+import { kingPlayed } from "../../configs/messages.config";
 
 @injectable()
 export default class King extends Card {
@@ -16,23 +13,16 @@ export default class King extends Card {
     public isPassive = false;
 
     public action(player: Player, { targetId }: PlayCardDto): Message {
-        if (!targetId) {
-            return Message.error();
-        }
-
-        const playerService = container.get<PlayerService>(
-            typesConfig.PlayerService,
-        );
-
-        const target = playerService.findPlayer(targetId);
-
-        if (target.isProtected()) {
-            return Message.error(cantAttackTarget);
-        }
-
-        this.swapCards(player, target);
-
-        return Message.success(`${player.name}${kingPlayed}${target.name}`);
+        return this.getAttackableTarget({
+            targetId,
+            onSuccess: (target: Player) => {
+                this.swapCards(player, target);
+                return Message.success(
+                    `${player.name}${kingPlayed}${target.name}`,
+                );
+            },
+            onError: (message: Message) => message,
+        });
     }
 
     public swapCards(player: Player, target: Player) {

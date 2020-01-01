@@ -2,18 +2,13 @@ import Card from "./Card";
 import { injectable } from "inversify";
 import Player from "../Player";
 import PlayCardDto from "../../dtos/PlayCardDto";
-import PlayerService from "../../services/PlayerService";
 import { container } from "../../configs/inversify.config";
 import typesConfig from "../../configs/types.config";
 import CardService from "../../services/CardService";
 import Princess from "./Princess";
 import State from "../../store/State";
 import Message from "../Message";
-import {
-    cantAttackTarget,
-    princessDiscard,
-    princePlayed,
-} from "../../configs/messages.config";
+import { princessDiscard, princePlayed } from "../../configs/messages.config";
 
 @injectable()
 export default class Prince extends Card {
@@ -22,22 +17,17 @@ export default class Prince extends Card {
     public isPassive = false;
 
     public action(player: Player, { targetId }: PlayCardDto): Message {
-        if (!targetId) {
-            return Message.error();
-        }
+        return this.getAttackableTarget({
+            targetId,
+            onSuccess: (target: Player) =>
+                this.discardTargetCard(player, target),
+            onError: (message: Message) => message,
+        });
+    }
 
-        const playerService = container.get<PlayerService>(
-            typesConfig.PlayerService,
-        );
-        const cardService = container.get<CardService>(typesConfig.CardService);
-
-        const target = playerService.findPlayer(targetId);
-
-        if (target.isProtected()) {
-            return Message.error(cantAttackTarget);
-        }
-
+    private discardTargetCard(player: Player, target: Player): Message {
         const card = target.cardsHand[0];
+        const cardService = container.get<CardService>(typesConfig.CardService);
 
         cardService.useCard(target, card);
 

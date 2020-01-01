@@ -10,7 +10,7 @@ export default class Priest extends Card {
     public value = 2;
     public isPassive = false;
 
-    public action(player: Player, dto: PlayCardDto): Message {
+    public action(player: Player, { targetId }: PlayCardDto): Message {
         return Message.success();
     }
 }

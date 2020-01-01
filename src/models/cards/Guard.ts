@@ -2,15 +2,8 @@ import Card from "./Card";
 import { injectable } from "inversify";
 import Player from "../Player";
 import PlayCardDto from "../../dtos/PlayCardDto";
-import { container } from "../../configs/inversify.config";
-import PlayerService from "../../services/PlayerService";
-import typesConfig from "../../configs/types.config";
 import Message from "../Message";
-import {
-    cantAttackTarget,
-    guardWin,
-    guardFail,
-} from "../../configs/messages.config";
+import { guardWin, guardFail } from "../../configs/messages.config";
 
 @injectable()
 export default class Guard extends Card {
@@ -22,20 +15,19 @@ export default class Guard extends Card {
         player: Player,
         { targetId, guessCardName }: PlayCardDto,
     ): Message {
-        if (!targetId) {
-            return Message.error();
-        }
+        return this.getAttackableTarget({
+            targetId,
+            onSuccess: (target: Player) =>
+                this.attackTarget(player, target, guessCardName),
+            onError: (message: Message) => message,
+        });
+    }
 
-        const playerService = container.get<PlayerService>(
-            typesConfig.PlayerService,
-        );
-
-        const target = playerService.findPlayer(targetId);
-
-        if (target.isProtected()) {
-            return Message.error(cantAttackTarget);
-        }
-
+    public attackTarget(
+        player: Player,
+        target: Player,
+        guessCardName: string,
+    ): Message {
         const targetCard = target.cardsHand[0];
 
         if (targetCard && targetCard.name === guessCardName) {

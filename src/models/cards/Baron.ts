@@ -2,15 +2,8 @@ import Card from "./Card";
 import { injectable } from "inversify";
 import PlayCardDto from "../../dtos/PlayCardDto";
 import Player from "../Player";
-import { container } from "../../configs/inversify.config";
-import PlayerService from "../../services/PlayerService";
-import typesConfig from "../../configs/types.config";
 import Message from "../Message";
-import {
-    cantAttackTarget,
-    baronEqualCard,
-    baronLoose,
-} from "../../configs/messages.config";
+import { baronEqualCard, baronLoose } from "../../configs/messages.config";
 
 @injectable()
 export default class Baron extends Card {
@@ -19,24 +12,14 @@ export default class Baron extends Card {
     public isPassive = false;
 
     public action(player: Player, { targetId }: PlayCardDto): Message {
-        if (!targetId) {
-            return Message.error();
-        }
-
-        const playerService = container.get<PlayerService>(
-            typesConfig.PlayerService,
-        );
-
-        const target = playerService.findPlayer(targetId);
-
-        if (target.isProtected()) {
-            return Message.error(cantAttackTarget);
-        }
-
-        this.doBattle(player, target);
+        return this.getAttackableTarget({
+            targetId,
+            onSuccess: (target: Player) => this.doBattle(player, target),
+            onError: (message: Message) => message,
+        });
     }
 
-    private doBattle(player: Player, target?: Player) {
+    private doBattle(player: Player, target?: Player): Message {
         const playerCard = player.cardsHand[0];
         const targetCard = target.cardsHand[0];
 
@@ -60,5 +43,7 @@ export default class Baron extends Card {
                 );
             }
         }
+
+        return Message.error();
     }
 }
