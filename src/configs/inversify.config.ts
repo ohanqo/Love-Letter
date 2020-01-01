@@ -9,6 +9,7 @@ import CardService from "../services/CardService";
 import GameService from "../services/GameService";
 import { cards, CardMapping } from "./cards.config";
 import Card from "../models/cards/Card";
+import GameMiddleware from "../middlewares/GameMiddleware";
 
 const container = new Container();
 
@@ -33,6 +34,8 @@ container
     .inSingletonScope();
 
 container.bind<Interfaces.Controller>(TYPE.Controller).to(GameController);
+
+container.bind(types.GameMiddleware).to(GameMiddleware);
 
 cards.forEach((c: CardMapping) => {
     container

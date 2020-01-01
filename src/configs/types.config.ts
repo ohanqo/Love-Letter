@@ -5,4 +5,5 @@ export default {
     GameService: Symbol("GameService"),
     Card: Symbol("Card"),
     CardFactory: Symbol("CardFactory"),
+    GameMiddleware: Symbol("GameMiddleware"),
 };

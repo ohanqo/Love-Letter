@@ -23,12 +23,11 @@ import {
     pickedCard,
     cantPickCard,
     chancellorPlayed,
-    cantPlayPrincess,
-    hasToPlayCountess,
     hasToPickCard,
 } from "../configs/messages.config";
 import Message from "../models/Message";
-import Princess from "../models/cards/Princess";
+import GameMiddleware from "../middlewares/GameMiddleware";
+import PlayCardType from "../types/PlayCardType";
 
 @injectable()
 @Controller("/")
@@ -38,6 +37,7 @@ export default class GameController {
         @inject(typesConfig.PlayerService) public playerService: PlayerService,
         @inject(typesConfig.CardService) public cardService: CardService,
         @inject(typesConfig.GameService) public gameService: GameService,
+        @inject(typesConfig.GameMiddleware) public middleware: GameMiddleware,
     ) {}
 
     @OnConnect("connection")
@@ -108,31 +108,21 @@ export default class GameController {
     ) {
         const player = this.playerService.findPlayer(id);
         const cardToPlay = player.findInHand(playCardDto.cardId);
+        const payload: PlayCardType = { player, cardToPlay };
 
-        // TODO: Refactor using middleware ?
-        if (player.hasToPickCard()) {
-            const msg = Message.error(hasToPickCard);
-            socket.emit(events.Message, msg);
-            return;
-        }
-
-        if (cardToPlay instanceof Princess) {
-            const msg = Message.error(cantPlayPrincess);
-            socket.emit(events.Message, msg);
-            return;
-        }
-
-        if (player.hasToPlayCountess()) {
-            const msg = Message.error(hasToPlayCountess);
-            socket.emit(events.Message, msg);
-            return;
-        }
-
-        this.cardService.useCard(player, cardToPlay);
-        const message = cardToPlay?.action(player, playCardDto);
-        this.gameService.switchPlayerTurn();
-        io.emit(events.CardPlayed, this.state.players);
-        io.emit(events.Message, message);
+        this.middleware.playCard({
+            payload,
+            onSuccess: () => {
+                this.cardService.useCard(player, cardToPlay);
+                const message = cardToPlay?.action(player, playCardDto);
+                this.gameService.switchPlayerTurn();
+                io.emit(events.CardPlayed, this.state.players);
+                io.emit(events.Message, message);
+            },
+            onError: (msg: Message) => {
+                socket.emit(events.Message, msg);
+            },
+        });
     }
 
     @OnMessage(events.PlayChancellorCard)
