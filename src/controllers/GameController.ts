@@ -28,6 +28,7 @@ import {
 import Message from "../models/Message";
 import GameMiddleware from "../middlewares/GameMiddleware";
 import PlayCardType from "../types/PlayCardType";
+import PlayPriestCardType from "../types/PlayPriestCardType";
 
 @injectable()
 @Controller("/")
@@ -174,6 +175,35 @@ export default class GameController {
         this.cardService.pushCards(cardsToPutInDeck);
         this.gameService.switchPlayerTurn();
         io.emit(events.CardPlayed, this.state.players);
+    }
+
+    @OnMessage(events.PlayPriestCard)
+    public onPlayPriestCard(
+        @SocketID() id: string,
+        @SocketIO() io: SocketIO.Server,
+        @Payload() { cardId, targetId }: PlayCardDto,
+        @ConnectedSocket() socket: SocketIO.Socket,
+    ) {
+        const player = this.playerService.findPlayer(id);
+        const target = this.playerService.findPlayer(targetId);
+        const payload: PlayPriestCardType = { player, target };
+
+        this.middleware.playPriestCard({
+            payload,
+            onSuccess: () => {
+                const cardToPlay = player.findInHand(cardId);
+                const targetCard = target.cardsHand[0];
+
+                this.cardService.useCard(player, cardToPlay);
+                this.gameService.switchPlayerTurn();
+
+                io.emit(events.CardPlayed, this.state.players);
+                socket.emit(events.ShowTargetCard, targetCard);
+            },
+            onError: (message: Message) => {
+                socket.emit(events.Message, message);
+            },
+        });
     }
 
     @OnDisconnect("disconnect")
