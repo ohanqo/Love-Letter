@@ -52,6 +52,10 @@ export default class PlayerService {
         player.isPlayerTurn = true;
     }
 
+    public getAlivePlayers(): Player[] {
+        return this.state.players.filter((p: Player) => !p.hasLost);
+    }
+
     public isGameFull(): boolean {
         return this.state.players.length >= rulesConfig.MAX_PLAYERS;
     }

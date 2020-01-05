@@ -12,6 +12,7 @@ export default class Player {
         public consumedCards: Card[] = [],
         public isPlayerTurn = false,
         public hasLost = false,
+        public points = 0
     ) {}
 
     public findInHand(cardId: string): Card {

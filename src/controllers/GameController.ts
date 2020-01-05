@@ -209,7 +209,7 @@ export default class GameController {
     @OnDisconnect("disconnect")
     public disconnect(@SocketID() id: string, @SocketIO() io: SocketIO.Server) {
         this.playerService.removePlayer(id);
-        this.gameService.checkMinPlayers();
+        this.gameService.resetIfNotEnoughPlayer();
         io.emit(events.Players, this.state.players);
     }
 }
