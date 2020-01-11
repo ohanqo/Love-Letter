@@ -20,6 +20,7 @@ const cantPlayPrincess = "Vous ne pouvez pas jouer la princesse.";
 const hasToPlayCountess =
     "Vous devez jouer votre comtesse car vous possédez un prince ou un roi.";
 const hasToPickCard = "Vous devez piocher une carte.";
+const hasLost = "Vous avez perdu";
 
 export {
     success,
@@ -42,4 +43,5 @@ export {
     cantPlayPrincess,
     hasToPlayCountess,
     hasToPickCard,
+    hasLost,
 };

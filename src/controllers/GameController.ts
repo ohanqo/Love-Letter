@@ -119,6 +119,7 @@ export default class GameController {
                 this.gameService.switchPlayerTurn();
                 io.emit(events.CardPlayed, this.state.players);
                 io.emit(events.Message, message);
+                this.gameService.checkRoundEnd(io);
             },
             onError: (msg: Message) => {
                 socket.emit(events.Message, msg);
@@ -175,6 +176,7 @@ export default class GameController {
         this.cardService.pushCards(cardsToPutInDeck);
         this.gameService.switchPlayerTurn();
         io.emit(events.CardPlayed, this.state.players);
+        this.gameService.checkRoundEnd(io);
     }
 
     @OnMessage(events.PlayPriestCard)
@@ -197,8 +199,9 @@ export default class GameController {
                 this.cardService.useCard(player, cardToPlay);
                 this.gameService.switchPlayerTurn();
 
-                io.emit(events.CardPlayed, this.state.players);
                 socket.emit(events.ShowTargetCard, targetCard);
+                io.emit(events.CardPlayed, this.state.players);
+                this.gameService.checkRoundEnd(io);
             },
             onError: (message: Message) => {
                 socket.emit(events.Message, message);

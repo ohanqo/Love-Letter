@@ -4,8 +4,6 @@ import State from "../store/State";
 import rulesConfig from "../configs/rules.config";
 import Player from "../models/Player";
 import * as _ from "lodash";
-import Card from "../models/cards/Card";
-import Handmaiden from "../models/cards/Handmaiden";
 
 @injectable()
 export default class PlayerService {
@@ -36,13 +34,17 @@ export default class PlayerService {
     }
 
     public getNextPlayer(): Player {
-        const currentPlayerIndex = _.findIndex(
-            this.state.players,
-            "isPlayerTurn",
+        const alivePlayersWithCurrentPlayer = this.state.players.filter(
+            (p: Player) => p.hasLost === false || p.isPlayerTurn,
         );
+
+        const currentTurnPlayerIndex = alivePlayersWithCurrentPlayer.findIndex(
+            (p: Player) => p.isPlayerTurn,
+        );
+
         return (
-            this.state.players[currentPlayerIndex + 1] ??
-            _.first(this.state.players)
+            alivePlayersWithCurrentPlayer[currentTurnPlayerIndex + 1] ??
+            alivePlayersWithCurrentPlayer[0]
         );
     }
 

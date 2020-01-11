@@ -6,6 +6,7 @@ import {
     cantPlayPrincess,
     hasToPlayCountess,
     cantAttackTarget,
+    hasLost,
 } from "../configs/messages.config";
 import Princess from "../models/cards/Princess";
 import PlayCardParamsType from "../types/PlayCardParamsType";
@@ -44,7 +45,9 @@ export default class GameMiddleware {
     }: PlayCardType): Message | undefined {
         let message: Message;
 
-        if (player.hasToPickCard()) {
+        if (player.hasLost) {
+            message = Message.error(hasLost);
+        } else if (player.hasToPickCard()) {
             message = Message.error(hasToPickCard);
         } else if (cardToPlay instanceof Princess) {
             message = Message.error(cantPlayPrincess);
@@ -61,7 +64,9 @@ export default class GameMiddleware {
     }: PlayPriestCardType): Message | undefined {
         let message: Message;
 
-        if (player.hasToPickCard()) {
+        if (player.hasLost) {
+            message = Message.error(hasLost);
+        } else if (player.hasToPickCard()) {
             message = Message.error(hasToPickCard);
         } else if (!target) {
             message = Message.error();
