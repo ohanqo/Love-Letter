@@ -51,7 +51,10 @@ export default class GameMiddleware {
             message = Message.error(hasToPickCard);
         } else if (cardToPlay instanceof Princess) {
             message = Message.error(cantPlayPrincess);
-        } else if (player.hasToPlayCountess()) {
+        } else if (
+            cardToPlay.name !== "Comtesse" &&
+            player.hasToPlayCountess()
+        ) {
             message = Message.error(hasToPlayCountess);
         }
 
@@ -70,8 +73,6 @@ export default class GameMiddleware {
             message = Message.error(hasToPickCard);
         } else if (!target) {
             message = Message.error();
-        } else if (target.isProtected()) {
-            message = Message.error(cantAttackTarget);
         }
 
         return message;

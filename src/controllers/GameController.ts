@@ -194,12 +194,14 @@ export default class GameController {
             payload,
             onSuccess: () => {
                 const cardToPlay = player.findInHand(cardId);
-                const targetCard = target.cardsHand[0];
+                const targetCard = target.isProtected()
+                    ? null
+                    : target.cardsHand[0];
 
+                socket.emit(events.ShowTargetCard, targetCard);
                 this.cardService.useCard(player, cardToPlay);
                 this.gameService.switchPlayerTurn();
 
-                socket.emit(events.ShowTargetCard, targetCard);
                 io.emit(events.CardPlayed, this.state.players);
                 this.gameService.checkRoundEnd(io);
             },
