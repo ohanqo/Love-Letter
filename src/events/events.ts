@@ -19,5 +19,6 @@ export default {
     PlayPriestCard: "PlayPriestCard",
     ShowTargetCard: "ShowTargetCard",
     Message: "Message",
-    RoundEnded: "RoundEnded"
+    RoundEnded: "RoundEnded",
+    GameEnded: "GameEnded"
 };

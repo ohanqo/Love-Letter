@@ -3,4 +3,5 @@ export default {
     MIN_PLAYERS: 2,
     MAX_CARD_PER_HAND: 2,
     CHANCELLOR_PICKED_CARD: 2,
+    NUMBER_OF_FAVORS: 13
 };

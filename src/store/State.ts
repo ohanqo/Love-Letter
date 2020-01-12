@@ -13,6 +13,7 @@ export default class State {
     public resetCards() {
         this.deckCards = [];
         this.burnedCard = undefined;
+        this.resetPlayers();
     }
 
     public resetState() {
@@ -20,5 +21,15 @@ export default class State {
         this.players = [];
         this.previousWinner = undefined;
         this.isRoundStarted = false;
+    }
+
+    public resetPlayers(hasToResetPoints = false) {
+        this.players.map((p: Player) => {
+            p.cardsHand = [];
+            p.consumedCards = [];
+            p.hasLost = false;
+            p.isPlayerTurn = false;
+            if (hasToResetPoints) p.points = 0;
+        });
     }
 }

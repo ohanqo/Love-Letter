@@ -6,6 +6,8 @@ import PlayerService from "./PlayerService";
 import Player from "../models/Player";
 import Card from "../models/cards/Card";
 import events from "../events/events";
+import rulesConfig from "../configs/rules.config";
+import { random } from "lodash";
 
 @injectable()
 export default class GameService {
@@ -43,6 +45,7 @@ export default class GameService {
             this.addSpiesPoint(alivePlayers);
             this.state.isRoundStarted = false;
             io.emit(events.RoundEnded, alivePlayers);
+            this.checkGameEnd(io);
         }
     }
 
@@ -53,6 +56,31 @@ export default class GameService {
         ) {
             this.state.resetState();
         }
+    }
+
+    private checkGameEnd(io: SocketIO.Server) {
+        const winners = this.playersWithEnoughFavors();
+
+        if (winners.length > 0) {
+            io.emit(events.GameEnded, winners);
+            this.state.resetPlayers(true);
+        }
+    }
+
+    private playersWithEnoughFavors(): Player[] {
+        const numberOfPointsToWin = this.getNumberOfFavorsToWin();
+
+        return this.state.players.filter(
+            (p: Player) => p.points >= numberOfPointsToWin,
+        );
+    }
+
+    private getNumberOfFavorsToWin(): number {
+        const numberOfPlayers = this.state.players.length;
+        const favorsByPlayers = rulesConfig.NUMBER_OF_FAVORS / numberOfPlayers;
+        return numberOfPlayers === 2
+            ? Math.floor(favorsByPlayers)
+            : Math.ceil(favorsByPlayers);
     }
 
     private distributeCards() {
@@ -67,9 +95,18 @@ export default class GameService {
                 prevValue > currValue ? prevValue : currValue,
             );
 
-        alivePlayers
-            .filter((p: Player) => p.cardsHand[0].value === winningValue)
-            .map((p: Player) => (p.points += 1));
+        const winners = alivePlayers.filter(
+            (p: Player) => p.cardsHand[0].value === winningValue,
+        );
+
+        winners.map((p: Player) => (p.points += 1));
+
+        this.assignWinnerToStartTheNextRound(winners);
+    }
+
+    private assignWinnerToStartTheNextRound(winners: Player[]) {
+        const randomWinnerIndex = random(0, winners.length - 1);
+        this.state.previousWinner = winners[randomWinnerIndex];
     }
 
     private addSpiesPoint(alivePlayers: Player[]) {

@@ -13,5 +13,4 @@
             -   [x] Si un seul joueur, on lui ajoute un point
             -   [x] Si deux joueurs différents, on ajoute pas de point
 -   [x] Implémenter la logique du Prêtre ?
--   [ ] Implémenter le démarrage d'une nouvelle manche
--   [ ] Implémenter la logique de fin de partie
+-   [x] Implémenter la logique de fin de partie
