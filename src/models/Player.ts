@@ -12,8 +12,11 @@ export default class Player {
         public consumedCards: Card[] = [],
         public isPlayerTurn = false,
         public hasLost = false,
-        public points = 0
-    ) {}
+        public points = 0,
+        public color = "#000000",
+    ) {
+        this.color = this.getColor();
+    }
 
     public findInHand(cardId: string): Card {
         return this.cardsHand.find((c: Card) => c.id === cardId);
@@ -41,5 +44,9 @@ export default class Player {
             (this.cardsHand.some((c: Card) => c instanceof Prince) ||
                 this.cardsHand.some((c: Card) => c instanceof King))
         );
+    }
+
+    private getColor() {
+        return "#" + ((Math.random() * 0xffffff) << 0).toString(16);
     }
 }
