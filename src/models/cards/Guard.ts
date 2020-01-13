@@ -33,10 +33,12 @@ export default class Guard extends Card {
         if (targetCard && targetCard.name === guessCardName) {
             this.updateToLooseStatus(target);
             return Message.success(
-                `${player.name}${guardWin}${target.name}: ${targetCard.name}`,
+                `${player.name}${guardWin}${target.name} (${targetCard.name})`,
             );
         }
 
-        return Message.error(`${player.name}${guardFail}${target.name}`);
+        return Message.error(
+            `${player.name}${guardFail}${target.name} (${guessCardName})`,
+        );
     }
 }

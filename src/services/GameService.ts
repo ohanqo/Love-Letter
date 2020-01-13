@@ -7,7 +7,8 @@ import Player from "../models/Player";
 import Card from "../models/cards/Card";
 import events from "../events/events";
 import rulesConfig from "../configs/rules.config";
-import { random } from "lodash";
+import { random, difference } from "lodash";
+import RoundResultDto from "../dtos/RoundResultDto";
 
 @injectable()
 export default class GameService {
@@ -41,10 +42,16 @@ export default class GameService {
         const alivePlayers = this.playerService.getAlivePlayers();
 
         if (this.isRoundEnded(alivePlayers)) {
+            const otherPlayers = difference(this.state.players, alivePlayers);
+            const roundResult: RoundResultDto = {
+                winners: alivePlayers,
+                others: otherPlayers,
+            };
+
             this.addWinnersPoint(alivePlayers);
             this.addSpiesPoint(alivePlayers);
             this.state.isRoundStarted = false;
-            io.emit(events.RoundEnded, alivePlayers);
+            io.emit(events.RoundEnded, roundResult);
             this.checkGameEnd(io);
         }
     }
@@ -62,7 +69,12 @@ export default class GameService {
         const winners = this.playersWithEnoughFavors();
 
         if (winners.length > 0) {
-            io.emit(events.GameEnded, winners);
+            const otherPlayers = difference(this.state.players, winners);
+            const roundResult: RoundResultDto = {
+                winners: winners,
+                others: otherPlayers,
+            };
+            io.emit(events.GameEnded, roundResult);
             this.state.resetPlayers(true);
         }
     }
