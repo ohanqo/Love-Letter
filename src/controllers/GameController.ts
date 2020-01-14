@@ -77,6 +77,7 @@ export default class GameController {
             const player = this.playerService.setFirstPlayerToPlay();
             io.emit(events.StartRound, this.state.players);
             io.emit(events.PlayerTurn, player);
+            io.emit(events.NumberOfCardsLeft, this.state.deckCards.length);
         }
     }
 
