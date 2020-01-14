@@ -91,6 +91,7 @@ export default class GameController {
         if (this.playerService.canPickCard(player)) {
             this.gameService.distributeCardToPlayer(player);
             io.emit(events.CardPicked, this.state.players);
+            io.emit(events.NumberOfCardsLeft, this.state.deckCards.length);
             socket.broadcast.emit(
                 events.Message,
                 Message.success(`${player.name}${pickedCard}`),
@@ -118,6 +119,7 @@ export default class GameController {
                 const message = cardToPlay?.action(player, playCardDto);
                 this.gameService.switchPlayerTurn();
                 io.emit(events.CardPlayed, this.state.players);
+                io.emit(events.NumberOfCardsLeft, this.state.deckCards.length);
                 io.emit(events.Message, message);
                 this.gameService.checkRoundEnd(io);
             },
@@ -176,6 +178,7 @@ export default class GameController {
         this.cardService.pushCards(cardsToPutInDeck);
         this.gameService.switchPlayerTurn();
         io.emit(events.CardPlayed, this.state.players);
+        io.emit(events.NumberOfCardsLeft, this.state.deckCards.length);
         this.gameService.checkRoundEnd(io);
     }
 
@@ -203,6 +206,7 @@ export default class GameController {
                 this.gameService.switchPlayerTurn();
 
                 io.emit(events.CardPlayed, this.state.players);
+                io.emit(events.NumberOfCardsLeft, this.state.deckCards.length);
                 this.gameService.checkRoundEnd(io);
             },
             onError: (message: Message) => {

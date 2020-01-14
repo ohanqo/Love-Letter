@@ -20,5 +20,6 @@ export default {
     ShowTargetCard: "ShowTargetCard",
     Message: "Message",
     RoundEnded: "RoundEnded",
-    GameEnded: "GameEnded"
+    GameEnded: "GameEnded",
+    NumberOfCardsLeft: "NumberOfCardsLeft",
 };
