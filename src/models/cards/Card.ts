@@ -2,10 +2,12 @@ import { v1 } from "uuid";
 import { injectable } from "inversify";
 import Player from "../Player";
 import PlayCardDto from "../../dtos/PlayCardDto";
-import { pull } from "lodash";
-import Handmaiden from "./Handmaiden";
 import Message from "../Message";
-import { cardPlayed, cantAttackTarget } from "../../configs/messages.config";
+import {
+    cardPlayed,
+    cantAttackTarget,
+    targetHasLost,
+} from "../../configs/messages.config";
 import { container } from "../../configs/inversify.config";
 import CardService from "../../services/CardService";
 import typesConfig from "../../configs/types.config";
@@ -50,6 +52,8 @@ export default abstract class Card {
             return onError(Message.error());
         } else if (target.isProtected()) {
             return onError(Message.error(cantAttackTarget));
+        } else if (target.hasLost) {
+            return onError(Message.error(targetHasLost));
         }
 
         return onSuccess(target);

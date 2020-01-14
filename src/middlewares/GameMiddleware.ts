@@ -5,8 +5,8 @@ import {
     hasToPickCard,
     cantPlayPrincess,
     hasToPlayCountess,
-    cantAttackTarget,
     hasLost,
+    targetHasLost,
 } from "../configs/messages.config";
 import Princess from "../models/cards/Princess";
 import PlayCardParamsType from "../types/PlayCardParamsType";
@@ -73,6 +73,8 @@ export default class GameMiddleware {
             message = Message.error(hasToPickCard);
         } else if (!target) {
             message = Message.error();
+        } else if (target.hasLost) {
+            message = Message.error(targetHasLost);
         }
 
         return message;
