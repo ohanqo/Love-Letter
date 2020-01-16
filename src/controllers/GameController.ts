@@ -29,6 +29,7 @@ import Message from "../models/Message";
 import GameMiddleware from "../middlewares/GameMiddleware";
 import PlayCardType from "../types/PlayCardType";
 import PlayPriestCardType from "../types/PlayPriestCardType";
+import Chat from "../dtos/ChatDto";
 
 @injectable()
 @Controller("/")
@@ -214,6 +215,11 @@ export default class GameController {
                 socket.emit(events.Message, message);
             },
         });
+    }
+
+    @OnMessage(events.Chat)
+    public onMessage(@SocketIO() io: SocketIO.Server, @Payload() chat: Chat) {
+        io.emit(events.Chat, chat);
     }
 
     @OnDisconnect("disconnect")

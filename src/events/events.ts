@@ -22,4 +22,5 @@ export default {
     RoundEnded: "RoundEnded",
     GameEnded: "GameEnded",
     NumberOfCardsLeft: "NumberOfCardsLeft",
+    Chat: "Chat",
 };
