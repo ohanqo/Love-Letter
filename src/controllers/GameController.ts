@@ -96,11 +96,11 @@ export default class GameController {
             io.emit(events.CardPicked, this.state.players);
             io.emit(events.NumberOfCardsLeft, this.state.deckCards.length);
             socket.broadcast.emit(
-                events.Message,
+                events.Chat,
                 new Chat(`${player.name}${pickedCard}`),
             );
         } else {
-            socket.emit(events.Message, new Chat(cantPickCard));
+            socket.emit(events.Chat, new Chat(cantPickCard));
         }
     }
 
@@ -123,11 +123,11 @@ export default class GameController {
                 this.gameService.switchPlayerTurn();
                 io.emit(events.CardPlayed, this.state.players);
                 io.emit(events.NumberOfCardsLeft, this.state.deckCards.length);
-                io.emit(events.Message, message);
+                io.emit(events.Chat, message);
                 this.gameService.checkRoundEnd(io);
             },
             onError: (msg: Chat) => {
-                socket.emit(events.Message, msg);
+                socket.emit(events.Chat, msg);
             },
         });
     }
@@ -143,7 +143,7 @@ export default class GameController {
 
         if (player.hasToPickCard()) {
             const msg = new Chat(hasToPickCard);
-            socket.emit(events.Message, msg);
+            socket.emit(events.Chat, msg);
             return;
         }
 
@@ -155,7 +155,7 @@ export default class GameController {
         this.cardService.useCard(player, cardToPlay);
         player.cardsHand.push(...pickedCards);
         io.emit(events.Players, this.state.players);
-        io.emit(events.Message, new Chat(`${player.name}${chancellorPlayed}`));
+        io.emit(events.Chat, new Chat(`${player.name}${chancellorPlayed}`));
         socket.emit(events.ChancellorChooseCard);
     }
 
@@ -204,13 +204,13 @@ export default class GameController {
                 socket.emit(events.ShowTargetCard, targetCard);
                 targetCard
                     ? io.emit(
-                          events.Message,
+                          events.Chat,
                           new Chat(
                               `${player.name} ${hasSeenCard} ${target.name}`,
                           ),
                       )
                     : io.emit(
-                          events.Message,
+                          events.Chat,
                           new Chat(
                               `${player.name} ${hasNotSeenCard} ${target.name}`,
                           ),
@@ -223,7 +223,7 @@ export default class GameController {
                 this.gameService.checkRoundEnd(io);
             },
             onError: (message: Chat) => {
-                socket.emit(events.Message, message);
+                socket.emit(events.Chat, message);
             },
         });
     }

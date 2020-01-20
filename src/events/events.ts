@@ -18,7 +18,6 @@ export default {
     ChancellorPlacedCard: "ChancellorPlacedCard",
     PlayPriestCard: "PlayPriestCard",
     ShowTargetCard: "ShowTargetCard",
-    Message: "Message",
     RoundEnded: "RoundEnded",
     GameEnded: "GameEnded",
     NumberOfCardsLeft: "NumberOfCardsLeft",
