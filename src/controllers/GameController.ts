@@ -24,6 +24,8 @@ import {
     cantPickCard,
     chancellorPlayed,
     hasToPickCard,
+    hasSeenCard,
+    hasNotSeenCard,
 } from "../configs/messages.config";
 import Message from "../models/Message";
 import GameMiddleware from "../middlewares/GameMiddleware";
@@ -204,6 +206,19 @@ export default class GameController {
                     : target.cardsHand[0];
 
                 socket.emit(events.ShowTargetCard, targetCard);
+                targetCard
+                    ? io.emit(
+                          events.Message,
+                          Message.success(
+                              `${player.name} ${hasSeenCard} ${target.name}`,
+                          ),
+                      )
+                    : io.emit(
+                          events.Message,
+                          Message.error(
+                              `${player.name} ${hasNotSeenCard} ${target.name}`,
+                          ),
+                      );
                 this.cardService.useCard(player, cardToPlay);
                 this.gameService.switchPlayerTurn();
 
