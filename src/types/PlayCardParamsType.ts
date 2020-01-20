@@ -1,8 +1,8 @@
 import PlayCardType from "./PlayCardType";
-import Message from "../models/Message";
+import Chat from "../models/Chat";
 
 export default interface PlayCardParamsType {
     payload: PlayCardType;
     onSuccess: () => void;
-    onError: (msg: Message) => void;
+    onError: (msg: Chat) => void;
 }
