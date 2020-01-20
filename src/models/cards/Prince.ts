@@ -7,8 +7,8 @@ import typesConfig from "../../configs/types.config";
 import CardService from "../../services/CardService";
 import Princess from "./Princess";
 import State from "../../store/State";
-import Message from "../Message";
-import { princessDiscard, princePlayed } from "../../configs/messages.config";
+import { princessDiscard, princePlayed } from "../../configs/gameevents.config";
+import Chat from "../Chat";
 
 @injectable()
 export default class Prince extends Card {
@@ -16,16 +16,16 @@ export default class Prince extends Card {
     public value = 5;
     public isPassive = false;
 
-    public action(player: Player, { targetId }: PlayCardDto): Message {
+    public action(player: Player, { targetId }: PlayCardDto): Chat {
         return this.getAttackableTarget({
             targetId,
             onSuccess: (target: Player) =>
                 this.discardTargetCard(player, target),
-            onError: (message: Message) => message,
+            onError: (message: Chat) => message,
         });
     }
 
-    private discardTargetCard(player: Player, target: Player): Message {
+    private discardTargetCard(player: Player, target: Player): Chat {
         const card = target.cardsHand[0];
         const cardService = container.get<CardService>(typesConfig.CardService);
 
@@ -33,12 +33,12 @@ export default class Prince extends Card {
 
         if (card instanceof Princess) {
             this.updateToLooseStatus(target);
-            return Message.success(`${target.name}${princessDiscard}`);
+            return new Chat(`${target.name}${princessDiscard}`);
         } else {
             const pickedCard = cardService.pickCard();
 
             this.handleNewCardPick(target, pickedCard);
-            return Message.success(
+            return new Chat(
                 `${player.name}${princePlayed}${target.name}: ${card.name}`,
             );
         }

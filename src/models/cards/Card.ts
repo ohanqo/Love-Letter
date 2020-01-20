@@ -2,17 +2,18 @@ import { v1 } from "uuid";
 import { injectable } from "inversify";
 import Player from "../Player";
 import PlayCardDto from "../../dtos/PlayCardDto";
-import Message from "../Message";
 import {
     cardPlayed,
     cantAttackTarget,
     targetHasLost,
-} from "../../configs/messages.config";
+    defaultError,
+} from "../../configs/gameevents.config";
 import { container } from "../../configs/inversify.config";
 import CardService from "../../services/CardService";
 import typesConfig from "../../configs/types.config";
 import GetAttackableTargetType from "../../types/GetAttackableTargetType";
 import PlayerService from "../../services/PlayerService";
+import Chat from "../Chat";
 
 @injectable()
 export default abstract class Card {
@@ -27,8 +28,8 @@ export default abstract class Card {
         this.id = v1();
     }
 
-    public action(player: Player, dto: PlayCardDto): Message {
-        return Message.success(`${player.name}${cardPlayed}${this.name}.`);
+    public action(player: Player, dto: PlayCardDto): Chat {
+        return new Chat(`${player.name}${cardPlayed}${this.name}.`);
     }
 
     public updateToLooseStatus(player: Player) {
@@ -42,18 +43,18 @@ export default abstract class Card {
         targetId,
         onSuccess,
         onError,
-    }: GetAttackableTargetType): Message {
+    }: GetAttackableTargetType): Chat {
         const playerService = container.get<PlayerService>(
             typesConfig.PlayerService,
         );
         const target = playerService.findPlayer(targetId);
 
         if (!target) {
-            return onError(Message.error());
+            return onError(new Chat(defaultError));
         } else if (target.isProtected()) {
-            return onError(Message.error(cantAttackTarget));
+            return onError(new Chat(cantAttackTarget));
         } else if (target.hasLost) {
-            return onError(Message.error(targetHasLost));
+            return onError(new Chat(targetHasLost));
         }
 
         return onSuccess(target);

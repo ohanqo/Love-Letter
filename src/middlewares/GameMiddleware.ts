@@ -1,17 +1,18 @@
 import { injectable } from "inversify";
 import PlayCardType from "../types/PlayCardType";
-import Message from "../models/Message";
 import {
     hasToPickCard,
     cantPlayPrincess,
     hasToPlayCountess,
     hasLost,
     targetHasLost,
-} from "../configs/messages.config";
+    defaultError,
+} from "../configs/gameevents.config";
 import Princess from "../models/cards/Princess";
 import PlayCardParamsType from "../types/PlayCardParamsType";
 import PlayPriestCardParamsType from "../types/PlayPriestCardParamsType";
 import PlayPriestCardType from "../types/PlayPriestCardType";
+import Chat from "../models/Chat";
 
 @injectable()
 export default class GameMiddleware {
@@ -42,20 +43,20 @@ export default class GameMiddleware {
     private getPlayCardPotentialErrorMessage({
         player,
         cardToPlay,
-    }: PlayCardType): Message | undefined {
-        let message: Message;
+    }: PlayCardType): Chat | undefined {
+        let message: Chat;
 
         if (player.hasLost) {
-            message = Message.error(hasLost);
+            message = new Chat(hasLost);
         } else if (player.hasToPickCard()) {
-            message = Message.error(hasToPickCard);
+            message = new Chat(hasToPickCard);
         } else if (cardToPlay instanceof Princess) {
-            message = Message.error(cantPlayPrincess);
+            message = new Chat(cantPlayPrincess);
         } else if (
             cardToPlay.name !== "Comtesse" &&
             player.hasToPlayCountess()
         ) {
-            message = Message.error(hasToPlayCountess);
+            message = new Chat(hasToPlayCountess);
         }
 
         return message;
@@ -64,17 +65,17 @@ export default class GameMiddleware {
     private getPlayPriestCardPotentialErrorMessage({
         player,
         target,
-    }: PlayPriestCardType): Message | undefined {
-        let message: Message;
+    }: PlayPriestCardType): Chat | undefined {
+        let message: Chat;
 
         if (player.hasLost) {
-            message = Message.error(hasLost);
+            message = new Chat(hasLost);
         } else if (player.hasToPickCard()) {
-            message = Message.error(hasToPickCard);
+            message = new Chat(hasToPickCard);
         } else if (!target) {
-            message = Message.error();
+            message = new Chat(defaultError);
         } else if (target.hasLost) {
-            message = Message.error(targetHasLost);
+            message = new Chat(targetHasLost);
         }
 
         return message;

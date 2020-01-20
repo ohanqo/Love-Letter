@@ -3,8 +3,8 @@ import { injectable } from "inversify";
 import Player from "../Player";
 import PlayCardDto from "../../dtos/PlayCardDto";
 import { pull } from "lodash";
-import Message from "../Message";
-import { kingPlayed } from "../../configs/messages.config";
+import { kingPlayed } from "../../configs/gameevents.config";
+import Chat from "../Chat";
 
 @injectable()
 export default class King extends Card {
@@ -12,16 +12,14 @@ export default class King extends Card {
     public value = 7;
     public isPassive = false;
 
-    public action(player: Player, { targetId }: PlayCardDto): Message {
+    public action(player: Player, { targetId }: PlayCardDto): Chat {
         return this.getAttackableTarget({
             targetId,
             onSuccess: (target: Player) => {
                 this.swapCards(player, target);
-                return Message.success(
-                    `${player.name}${kingPlayed}${target.name}`,
-                );
+                return new Chat(`${player.name}${kingPlayed}${target.name}`);
             },
-            onError: (message: Message) => message,
+            onError: (message: Chat) => message,
         });
     }
 

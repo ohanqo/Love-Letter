@@ -2,8 +2,8 @@ import Card from "./Card";
 import { injectable } from "inversify";
 import Player from "../Player";
 import PlayCardDto from "../../dtos/PlayCardDto";
-import Message from "../Message";
-import { guardWin, guardFail } from "../../configs/messages.config";
+import { guardWin, guardFail } from "../../configs/gameevents.config";
+import Chat from "../Chat";
 
 @injectable()
 export default class Guard extends Card {
@@ -14,12 +14,12 @@ export default class Guard extends Card {
     public action(
         player: Player,
         { targetId, guessCardName }: PlayCardDto,
-    ): Message {
+    ): Chat {
         return this.getAttackableTarget({
             targetId,
             onSuccess: (target: Player) =>
                 this.attackTarget(player, target, guessCardName),
-            onError: (message: Message) => message,
+            onError: (message: Chat) => message,
         });
     }
 
@@ -27,17 +27,17 @@ export default class Guard extends Card {
         player: Player,
         target: Player,
         guessCardName: string,
-    ): Message {
+    ): Chat {
         const targetCard = target.cardsHand[0];
 
         if (targetCard && targetCard.name === guessCardName) {
             this.updateToLooseStatus(target);
-            return Message.success(
+            return new Chat(
                 `${player.name}${guardWin}${target.name} (${targetCard.name})`,
             );
         }
 
-        return Message.error(
+        return new Chat(
             `${player.name}${guardFail}${target.name} (${guessCardName})`,
         );
     }
