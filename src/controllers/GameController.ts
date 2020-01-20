@@ -20,7 +20,6 @@ import rulesConfig from "../configs/rules.config";
 import Card from "../models/cards/Card";
 import { tail } from "lodash";
 import {
-    pickedCard,
     cantPickCard,
     chancellorPlayed,
     hasToPickCard,
@@ -95,10 +94,6 @@ export default class GameController {
             this.gameService.distributeCardToPlayer(player);
             io.emit(events.CardPicked, this.state.players);
             io.emit(events.NumberOfCardsLeft, this.state.deckCards.length);
-            socket.broadcast.emit(
-                events.Chat,
-                new Chat(`${player.name}${pickedCard}`),
-            );
         } else {
             socket.emit(events.Chat, new Chat(cantPickCard));
         }

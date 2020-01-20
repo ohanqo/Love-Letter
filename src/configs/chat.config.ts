@@ -1,2 +1,2 @@
-export const Chat = "CHAT"
-export const GameEvent = "gameevent"
+export const Chat = "chat";
+export const GameEvent = "gameevent";
