@@ -4,6 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+        "start": "node build/src/index.js",
         "serve": "concurrently --kill-others \"npm run build\" \"nodemon build/src/index.js\"",
         "build": "tsc -w -p tsconfig.json"
     },
